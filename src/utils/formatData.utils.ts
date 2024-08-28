@@ -1,7 +1,5 @@
-class FormatData{
+class FormatData {}
 
-}
+const formatData = new FormatData();
 
-const formatData = new FormatData()
-
-export {formatData}
+export { formatData };

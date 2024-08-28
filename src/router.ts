@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { measureRouter } from "./routes/measure.router";
+import { Router } from 'express';
+import { measureRouter } from './routes/measure.router';
 
 class AppRouter {
   public router: Router;
@@ -10,12 +10,12 @@ class AppRouter {
   }
 
   private configureRoutes(): void {
-    this.router.use('/image', measureRouter.getRouter())
+    this.router.use('/image', measureRouter.getRouter());
   }
 
   public getRouter(): Router {
     return this.router;
-}
+  }
 }
 
 const appRouter = new AppRouter();
