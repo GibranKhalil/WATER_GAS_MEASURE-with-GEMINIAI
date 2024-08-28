@@ -1,0 +1,25 @@
+{
+  "name": "desafiogemini",
+  "version": "1.0.0",
+  "description": "Desenvolvimento de uma api integrada com o gemini para desafio técnio da shooper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon",
+    "build": "npx tsc"
+  },
+  "author": "Gibran Khalil",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.17.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.5.0",
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2"
+  }
+}
