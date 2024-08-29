@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
 import { MeasureType } from '../@types/measure.types';
 
 export class CreateMeasureDTO {
@@ -12,6 +18,7 @@ export class CreateMeasureDTO {
   customer_code: string;
 
   @IsNotEmpty({ message: 'A data de medição não pode estar vazia' })
+  @IsDate({ message: 'A data deve estar em um formato válido' })
   measure_datetime: Date;
 
   @IsNotEmpty({ message: 'Deve ser informado o tipo de medição' })

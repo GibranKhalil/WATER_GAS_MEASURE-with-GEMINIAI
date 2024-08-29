@@ -15,7 +15,6 @@ export class MeasureEntity {
   @Column({
     name: 'measure_datetime',
     type: 'timestamp',
-    length: 100,
     nullable: false,
   })
   measure_datetime: Date;
@@ -24,10 +23,12 @@ export class MeasureEntity {
     name: 'measure_type',
     type: 'enum',
     enum: MeasureType,
-    length: 11,
     nullable: false,
   })
   measure_type: MeasureType;
+
+  @Column({ name: 'value', type: 'float', nullable: false })
+  value: number;
 
   @Column({
     name: 'has_confirmed',

@@ -19,6 +19,14 @@ class MeasureRouter {
       '/temp-image/:filename',
       this.controller.getTempImage.bind(this.controller),
     );
+    this.router.patch(
+      '/confirm',
+      this.controller.patchConfirmMeasure.bind(this.controller),
+    );
+    this.router.get(
+      '/:customer_code/list',
+      this.controller.getCustomerMeasuresList.bind(this.controller),
+    );
   }
 
   public getRouter(): Router {

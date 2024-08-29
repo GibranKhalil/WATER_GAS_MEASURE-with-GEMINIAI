@@ -10,7 +10,7 @@ class AppRouter {
   }
 
   private configureRoutes(): void {
-    this.router.use('/image', measureRouter.getRouter());
+    this.router.use('/', measureRouter.getRouter());
   }
 
   public getRouter(): Router {

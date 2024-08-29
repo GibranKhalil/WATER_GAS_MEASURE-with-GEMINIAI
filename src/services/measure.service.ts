@@ -14,7 +14,7 @@ export class MeasureService {
 
   async getAllCustomerMeasures(customer_code: string) {
     try {
-      const response = this.measureRepository.find({
+      const response = await this.measureRepository.find({
         where: { customer_code },
       });
       return response;
@@ -28,7 +28,7 @@ export class MeasureService {
     measure_type: MeasureType,
   ) {
     try {
-      const response = this.measureRepository.find({
+      const response = await this.measureRepository.find({
         where: { customer_code, measure_type },
       });
       return response;
@@ -41,7 +41,7 @@ export class MeasureService {
 
   async createMeasure(measureData: CreateMeasureDTO) {
     try {
-      return this.measureRepository.create(measureData);
+      return await this.measureRepository.save(measureData);
     } catch (error) {
       throw new Error(`Erro ao criar uma nova leitura: ${error}`);
     }
@@ -84,20 +84,18 @@ export class MeasureService {
 
   async checkMeasureExistsByID(measure_uuid: string): Promise<boolean> {
     try {
-      const checkCode = this.measureRepository.findOne({
+      const checkCode = await this.measureRepository.findOne({
         where: { id: measure_uuid },
       });
       return !!checkCode;
     } catch (error) {
-      throw new Error(
-        `Erro ao verificar se a leitura existe pelo código de leitura: ${error}`,
-      );
+      throw new Error(`${error.message}`);
     }
   }
 
   async checkMeasureHadConfirmed(measure_uuid: string): Promise<boolean> {
     try {
-      const checkConfirmed = this.measureRepository.findOne({
+      const checkConfirmed = await this.measureRepository.findOne({
         where: { id: measure_uuid, has_confirmed: true },
       });
       return !!checkConfirmed;

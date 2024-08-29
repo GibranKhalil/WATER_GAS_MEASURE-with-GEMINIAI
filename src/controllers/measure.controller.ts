@@ -37,7 +37,7 @@ export class MeasureController {
   }
 
   buildTempImageURL(protocol: string, host: string, filePath: string) {
-    return `${protocol}://${host}/image/temp-image/${path.basename(filePath)}`;
+    return `${protocol}://${host}/temp-image/${path.basename(filePath)}`;
   }
 
   buildErrorResponse(
@@ -66,7 +66,6 @@ export class MeasureController {
     mimeType: string,
   ): Promise<number> {
     const text = await geminiService.fileToText(base64Data, mimeType);
-
     return Number(text);
   }
 
@@ -83,7 +82,7 @@ export class MeasureController {
     createMeasureDTO.measure_type = measure_type;
     createMeasureDTO.value = 9999;
 
-    const errors = await validate(createMeasureDTO);
+    const errors = await validate(createMeasureDTO, { always: true });
 
     return errors.length > 0;
   }
@@ -118,7 +117,7 @@ export class MeasureController {
           .json(
             this.buildErrorResponse(
               'INVALID_DATA',
-              'Certifique-se de incluir imagem, tipo de medida, código do cliente e data da medida',
+              'Certifique-se de incluir imagem, tipo de medida, código do cliente e data da medida nos formatos corretos',
             ),
           );
       }
@@ -137,22 +136,6 @@ export class MeasureController {
       const base64Data = extractData.extractBase64Data(image);
       const mimeType = extractData.extractMimeType(image) as string;
 
-      const measure_value = await this.getMeasureValueWithGemini(
-        base64Data,
-        mimeType,
-      );
-
-      if (!measure_value) {
-        return res
-          .status(500)
-          .json(
-            this.buildErrorResponse(
-              'INVALID_DATA',
-              'Não foi possível ler o número na imagem, tente novamente',
-            ),
-          );
-      }
-
       const doubleMeasure = await this.service.checkMeasureTypeInMonth(
         measure_type,
         customer_code,
@@ -170,6 +153,22 @@ export class MeasureController {
           );
       }
 
+      const measure_value = await this.getMeasureValueWithGemini(
+        base64Data,
+        mimeType,
+      );
+
+      if (!measure_value) {
+        return res
+          .status(500)
+          .json(
+            this.buildErrorResponse(
+              'INVALID_DATA',
+              'Não foi possível ler o número na imagem, tente novamente',
+            ),
+          );
+      }
+
       const filePath = this.saveTempImage(base64Data, mimeType);
       const tempUrl = this.buildTempImageURL(
         req.protocol,
@@ -177,18 +176,18 @@ export class MeasureController {
         filePath,
       );
 
-      await this.service.createMeasure({
+      const create = await this.service.createMeasure({
         customer_code: customer_code,
-        image: image,
+        image: tempUrl,
         measure_datetime: new Date(measure_datetime),
         measure_type: measure_type,
         value: measure_value,
       });
 
       const response: SuccessResponse = {
-        image_url: tempUrl,
-        measure_uuid: crypto.randomUUID(),
-        measure_value: measure_value,
+        image_url: create.image,
+        measure_uuid: create.id,
+        measure_value: create.value,
       };
 
       return res.status(200).json(response);
@@ -206,6 +205,17 @@ export class MeasureController {
 
   async patchConfirmMeasure(req: Request, res: Response) {
     const { measure_uuid, confirmed_value } = req.body;
+
+    if (!measure_uuid || !confirmed_value || !parseInt(confirmed_value)) {
+      return res
+        .status(400)
+        .json(
+          this.buildErrorResponse(
+            'INVALID_DATA',
+            'Os dados fornecidos no corpo da requisição são inválidos',
+          ),
+        );
+    }
 
     try {
       const validMeasure = await this.service.checkMeasureExistsByID(
@@ -270,7 +280,7 @@ export class MeasureController {
       const measures = measure_type
         ? await this.service.getAllCustomerMeasuresByType(
             customer_code,
-            measure_type as MeasureType,
+            measure_type.toUpperCase() as MeasureType,
           )
         : await this.service.getAllCustomerMeasures(customer_code);
 

@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import * as dotenv from 'dotenv';
 
 class GeminiService {
   private prompt: string = '';
@@ -29,7 +30,7 @@ class GeminiService {
     return result.response.text();
   }
 }
-
+dotenv.config();
 const apiKey = process.env.GEMINI_API_KEY as string;
 const genAI = new GoogleGenerativeAI(apiKey);
 const geminiService = new GeminiService(genAI);
