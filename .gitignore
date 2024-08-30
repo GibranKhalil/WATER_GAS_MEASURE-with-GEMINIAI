@@ -1,4 +1,4 @@
 /node_modules
 .env
 /pgdata
-/src/temp
+/dist

@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { postgresConfigService } from './config/postgres.ormconfig';
+import { MeasureEntity } from './entities/measure.entity';
 
 export const AppDataSource = new DataSource({
   type: postgresConfigService.type,
@@ -8,6 +9,6 @@ export const AppDataSource = new DataSource({
   username: postgresConfigService.username,
   password: postgresConfigService.password as string,
   database: postgresConfigService.database,
-  entities: postgresConfigService.entities,
+  entities: [MeasureEntity],
   synchronize: postgresConfigService.synchronize,
 });

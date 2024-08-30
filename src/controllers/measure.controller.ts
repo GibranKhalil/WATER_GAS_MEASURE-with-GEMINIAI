@@ -16,7 +16,7 @@ import { validate } from 'class-validator';
 export class MeasureController {
   constructor(private readonly service: MeasureService = new MeasureService()) {
     geminiService.setPrompt(
-      'Me devolva apenas o valor que está no visor do medidor',
+      'Me devolva apenas o valor inteiro que está no visor do medidor, ignore os 0',
     );
   }
 
@@ -66,6 +66,7 @@ export class MeasureController {
     mimeType: string,
   ): Promise<number> {
     const text = await geminiService.fileToText(base64Data, mimeType);
+    console.log(text);
     return Number(text);
   }
 
