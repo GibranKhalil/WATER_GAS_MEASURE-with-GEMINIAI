@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { measureRouter } from './routes/measure.router';
 
+/**
+ * Classe responsável por configurar as rotas da aplicação
+ */
 class AppRouter {
   public router: Router;
 

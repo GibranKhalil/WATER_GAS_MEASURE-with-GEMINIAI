@@ -3,6 +3,9 @@ import { appRouter } from './router';
 import 'reflect-metadata';
 import { AppDataSource } from './dataSource';
 
+/**
+ * Classe que inicializa a aplicação
+ */
 export class App {
   public server: express.Application;
   private datasource = AppDataSource;
@@ -18,10 +21,16 @@ export class App {
     this.server.use(express.json());
   }
 
+  /**
+   * Configuração das rotas da aplicação
+   */
   private router() {
     this.server.use(appRouter.getRouter());
   }
 
+  /**
+   * Inicialização do banco de dados
+   */
   private async initializeDatabase() {
     try {
       await this.datasource.initialize();

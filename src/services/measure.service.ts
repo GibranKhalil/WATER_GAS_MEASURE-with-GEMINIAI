@@ -5,6 +5,9 @@ import { UpdateMeasureDTO } from '../dto/updateMeasure.dto';
 import { MeasureEntity } from '../entities/measure.entity';
 import { Repository } from 'typeorm';
 
+/**
+ * Classe que se comunica com o banco de dados através do typeORM
+ */
 export class MeasureService {
   constructor(
     private readonly measureRepository: Repository<MeasureEntity> = AppDataSource.getRepository(
@@ -12,6 +15,11 @@ export class MeasureService {
     ),
   ) {}
 
+  /**
+   * Resgata todas as medidas vinculadas ao usuário baseando-se no código de cliente
+   * @param customer_code código do cliente
+   * @returns
+   */
   async getAllCustomerMeasures(customer_code: string) {
     try {
       const response = await this.measureRepository.find({
@@ -23,6 +31,12 @@ export class MeasureService {
     }
   }
 
+  /**
+   * Resgata todas as medições vinculadas ao usuário filtrando pelo tipo de medição
+   * @param customer_code código do cliente
+   * @param measure_type tipo de medida
+   * @returns
+   */
   async getAllCustomerMeasuresByType(
     customer_code: string,
     measure_type: MeasureType,
@@ -39,6 +53,11 @@ export class MeasureService {
     }
   }
 
+  /**
+   * Cria uma nova medida dentro do banco de dados
+   * @param measureData
+   * @returns
+   */
   async createMeasure(measureData: CreateMeasureDTO) {
     try {
       return await this.measureRepository.save(measureData);
@@ -47,6 +66,12 @@ export class MeasureService {
     }
   }
 
+  /**
+   * Atualiza uma medição
+   * @param measureData
+   * @param measure_uuid id do objeto alvo da atualização
+   * @returns
+   */
   async updateMeasure(measureData: UpdateMeasureDTO, measure_uuid: string) {
     try {
       return this.measureRepository.update(measure_uuid, measureData);
@@ -55,6 +80,13 @@ export class MeasureService {
     }
   }
 
+  /**
+   * Verificar se uma medida do mesmo tipo já foi realizada nesse mês
+   * @param measureType Tipo de medida
+   * @param customer_code Código do cliente
+   * @param targetDate
+   * @returns
+   */
   async checkMeasureTypeInMonth(
     measureType: MeasureType,
     customer_code: string,
@@ -82,6 +114,11 @@ export class MeasureService {
     }
   }
 
+  /**
+   * Verificar se uma medida existe baseando-se no id
+   * @param measure_uuid id da medição
+   * @returns
+   */
   async checkMeasureExistsByID(measure_uuid: string): Promise<boolean> {
     try {
       const checkCode = await this.measureRepository.findOne({
@@ -93,6 +130,11 @@ export class MeasureService {
     }
   }
 
+  /**
+   * Verificar se o valor de uma medida já foi confirmado
+   * @param measure_uuid
+   * @returns
+   */
   async checkMeasureHadConfirmed(measure_uuid: string): Promise<boolean> {
     try {
       const checkConfirmed = await this.measureRepository.findOne({

@@ -1,6 +1,9 @@
 import { OrmConfig } from '../@types/interfaces/ormConfig.interface';
 import * as dotenv from 'dotenv';
 
+/**
+ * Classe de Configuração do banco postgres dockerizado
+ */
 class PostgresConfigService implements OrmConfig {
   type: 'postgres';
   host: string;

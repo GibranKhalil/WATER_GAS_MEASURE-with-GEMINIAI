@@ -1,6 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as dotenv from 'dotenv';
 
+/**
+ * Class reponsável por se comunicar com o serviço da API do GEMINI
+ */
 class GeminiService {
   private prompt: string = '';
 

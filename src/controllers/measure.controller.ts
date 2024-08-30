@@ -13,33 +13,69 @@ import { MeasureService } from '../services/measure.service';
 import { CreateMeasureDTO } from '../dto/createMeasure.dto';
 import { validate } from 'class-validator';
 
+/**
+ * Controller para operações relacionadas às medições de consumo de GAS/WATER
+ */
 export class MeasureController {
+  /**
+   * Construtor da Classe que instancia o serviço da entidade
+   * @param service Classe responsável por comunicar-se com o banco de dados
+   */
   constructor(private readonly service: MeasureService = new MeasureService()) {
     geminiService.setPrompt(
       'Me devolva apenas o valor inteiro que está no visor do medidor, ignore os 0',
     );
   }
 
+  /**
+   * Função responsável por criar o nome de um arquivo único
+   * @param mimeType Tipo do arquivo
+   * @returns Retornar um nome para o arquivo
+   */
   buildFilename(mimeType: string) {
     const fileExtension: string = mimeType.split('/')[1];
     return `${crypto.randomUUID()}.${fileExtension}`;
   }
 
+  /**
+   * Constroi o caminho do arquivo até o diretório temp, responsável por armazenar dados temporários
+   * @param mimeType Tipo do arquivo
+   * @returns retorna uma string com o caminho do arquivo
+   */
   buildTempFilePath(mimeType: string) {
     const filename = this.buildFilename(mimeType);
     return path.join('src', 'temp', filename);
   }
 
+  /**
+   * Função responsável por escrever um arquivo no diretório temp
+   * @param imageData Dados do arquivo criptografado em base64
+   * @param mimeType Tipo do arquivo enviado
+   * @returns retorna o caminho de busca do arquivo
+   */
   saveTempImage(imageData: string, mimeType: string) {
     const filePath = this.buildTempFilePath(mimeType);
     fs.writeFileSync(filePath, imageData, { encoding: 'base64' });
     return filePath;
   }
 
+  /**
+   * Constrói uma url para acessar o arquivo enviado
+   * @param protocol Protocolo de acesso a página
+   * @param host Domain Name (DN) da página
+   * @param filePath caminho do arquivo
+   * @returns retorna uma url para disponibilizar ao usuário
+   */
   buildTempImageURL(protocol: string, host: string, filePath: string) {
     return `${protocol}://${host}/temp-image/${path.basename(filePath)}`;
   }
 
+  /**
+   * Função responsável por criar respostas para exibir erros ao usuário
+   * @param error_code Tipo de erro
+   * @param error_description Descricao do erro
+   * @returns retorna um objeto do tipo ErrorResponse
+   */
   buildErrorResponse(
     error_code:
       | 'INVALID_DATA'
@@ -57,19 +93,37 @@ export class MeasureController {
     };
   }
 
+  /**
+   * Função que verifica se um tipo de medida é válido
+   * @param measure_type tipo de medida
+   * @returns um booleano que mostra se é um tipo válido ou não
+   */
   checkMeasureTypeIsValid(measure_type: string): boolean {
     return measure_type.toUpperCase() in MeasureType;
   }
 
+  /**
+   * Função responsável por se comunicar com o GEMINI, a IA do google e obter o número no visor do medidor
+   * @param base64Data Imagem encriptografada em base64
+   * @param mimeType Tipo da Imagem
+   * @returns um número representando a medida
+   */
   async getMeasureValueWithGemini(
     base64Data: string,
     mimeType: string,
   ): Promise<number> {
     const text = await geminiService.fileToText(base64Data, mimeType);
-    console.log(text);
     return Number(text);
   }
 
+  /**
+   * Função responsável por validar o corpo da requisição utilizando a biblioteca class-validator e class-transformer
+   * @param image
+   * @param customer_code
+   * @param measure_datetime
+   * @param measure_type
+   * @returns
+   */
   async validatePostRequest(
     image: string,
     customer_code: string,
@@ -88,6 +142,12 @@ export class MeasureController {
     return errors.length > 0;
   }
 
+  /**
+   * Rota para resgatar um arquivo armazenado
+   * @param req
+   * @param res
+   * @returns retorna uma imagem para o usuário
+   */
   async getTempImage(req: Request, res: Response) {
     const filename = req.params.filename;
     const filePath = path.resolve('src', 'temp', filename);
@@ -101,6 +161,12 @@ export class MeasureController {
     });
   }
 
+  /**
+   * Rota para enviar uma nova medição
+   * @param req
+   * @param res
+   * @returns
+   */
   async postMeasure(req: Request, res: Response) {
     const { image, measure_type, customer_code, measure_datetime } = req.body;
 
@@ -204,6 +270,12 @@ export class MeasureController {
     }
   }
 
+  /**
+   * Rota responsável por confirmar os valores antes enviados
+   * @param req
+   * @param res
+   * @returns resultado de sucesso ou não
+   */
   async patchConfirmMeasure(req: Request, res: Response) {
     const { measure_uuid, confirmed_value } = req.body;
 
@@ -265,6 +337,12 @@ export class MeasureController {
     }
   }
 
+  /**
+   * Rota responsável por devolver ao usuário suas medidas baseando-se no seu customer_code
+   * @param req
+   * @param res
+   * @returns
+   */
   async getCustomerMeasuresList(req: Request, res: Response) {
     const { customer_code } = req.params;
     const measure_type = req.query.measure_type as string;
