@@ -20,27 +20,27 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
     ports:
-      - '8081:81'
+      - '8081:80'
     depends_on:
       - postgres
     networks:
       - postgres
 
-app:
-  build: .
-  ports:
-    - '8080:8080'
-  environment:
-    - NODE_ENV=production
-    - DB_HOST=${DB_HOST}
-    - DB_PORT=${DB_PORT}
-    - DB_USERNAME=${DB_USERNAME}
-    - DB_PASSWORD=${DB_PASSWORD}
-    - DB_NAME=${DB_NAME}
-  depends_on:
-    - postgres
-  networks:
-    - postgres
+  app:
+    build: .
+    ports:
+      - '8080:8080'
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      - postgres
+    networks:
+      - postgres
 
 networks:
   postgres:
